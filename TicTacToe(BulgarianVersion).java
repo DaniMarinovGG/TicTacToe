@@ -1,22 +1,39 @@
-package paket4e;
-
 import java.util.*;
 
-public class TicTacToe {
+public class Main {
 
 	public static void main(String[] args) {
+		
+		//cvetove sloji
+		
 		Scanner kb = new Scanner(System.in);
 		System.out.println("TicTacToe");
-		System.out.println("Напиши размера на морския шах!");
-		System.out.print("Размер x: ");
-		int a = kb.nextInt();
+		System.out.println("Въведи размера на морския шах (x на y) , колко символа трябва да има един до друг, за да се спечели играта и броят играчи.");
+		System.out.println("Четирите стойности трябва да са естествени числа и да са отделени със запетая!");
 		
-		System.out.print("Размер y: ");
-		int b = kb.nextInt();
+		String[] size_and_length;
 		
-//		System.out.println("Въведи размера на морския шах (x на y) и колко символа трябва да има един до друг, за да се спечели играта. Трите стойности трябва да са естествени числа и да са отделени със запетая!");
-//		
-//		String size_and_length = kb.nextLine().replaceAll(" ", "").replace("[^0-9]", "")
+		do {
+			System.out.print("Избор: ");
+			size_and_length = kb.nextLine().replaceAll("[^0-9,]", "").split(",");
+			if (size_and_length.length != 4) {
+				System.out.println("Моля въведете четири стойности!");
+			}
+		} while (size_and_length.length != 4);
+		
+		final int a = Integer.parseInt(size_and_length[0]); // x = a
+		final int b = Integer.parseInt(size_and_length[1]); // y = b
+		final int n = Integer.parseInt(size_and_length[2]);
+		final int player_count = Integer.parseInt(size_and_length[3]);
+		
+		String[] player = new String[player_count]; // символ и цвят
+		
+		System.out.println("\nВъведете символите на играчите!");
+		
+		for (int i = 0; i < player.length; i++) {
+			System.out.print("Символ на играч " + (i+1) + ": ");
+			player[i] = kb.next();
+		}
 		
 		
 		String[][] table = new String[a+1][b+1];
@@ -37,62 +54,37 @@ public class TicTacToe {
 		
 		String input;
 		String cords [];
-		int x=1, y=1;
+		int x, y;
 		boolean invalid_input;
 		
 		while (true) {
-			// играч 1
-			do {
-				System.out.print("Играч О: ");
-				input = kb.nextLine().replaceAll(" ", "").toLowerCase();
-				if (input.equals("exit")) {System.out.println("Излязохте от играта!"); System.exit(0);}
-				cords = input.split(",");
+			for (int i = 0; i < player.length; i++) {
+				do {
+					System.out.print("Играч " + player[i] + ": ");
+					input = kb.nextLine().replaceAll(" ", "").toLowerCase();
+					if (input.equals("exit")) {System.out.println("Излязохте от играта!"); System.exit(0);}
+					cords = input.split(",");
 			
-				x = Integer.parseInt(cords[0]);
-				y = Integer.parseInt(cords[1]);
+					x = Integer.parseInt(cords[0]);
+					y = Integer.parseInt(cords[1]);
 				
-				invalid_input = x < 1 || y < 1 || x > a || y > b;
+					invalid_input = x < 1 || y < 1 || x > a || y > b;
 				
-				if (invalid_input) System.err.println("Грешни входни данни!");
+					if (invalid_input) System.err.println("Грешни входни данни!");
 				
-				if (!invalid_input) {
-					if (!table[x][y].equals(" ")) {
-						System.err.println("Позицията вече е заета! Изберете друго място!");
-						invalid_input = true;
+					if (!invalid_input) {
+						if (!table[x][y].equals(" ")) {
+							System.err.println("Позицията вече е заета! Изберете друго място!");
+							invalid_input = true;
+						}
 					}
-				}
 				
-			} while (invalid_input);
+				} while (invalid_input);
 			
-			table[x][y] = "O";
-			tablica(table, a, b);
-			checkWin(table, a, b); // ново е тук !!!
-			// играч 2
-			do {
-				System.out.print("Играч X: ");
-				input = kb.nextLine().replaceAll(" ", "").toLowerCase();
-				if (input.equals("exit")) {System.out.println("Излязохте от играта!"); System.exit(0);}
-				cords = input.split(",");
-			
-				x = Integer.parseInt(cords[0]);
-				y = Integer.parseInt(cords[1]);
-				
-				invalid_input = x < 1 || y < 1 || x > a || y > b;
-				
-				if (invalid_input) System.err.println("Грешни входни данни!");
-				
-				if (!invalid_input) {
-					if (!table[x][y].equals(" ")) {
-						System.err.println("Позицията вече е заета! Изберете друго място!");
-						invalid_input = true;
-					}
-				}
-				
-			} while (invalid_input);
-			
-			table[x][y] = "X";
-			tablica(table, a, b);
-			checkWin(table, a, b);
+				table[x][y] = player[i];
+				tablica(table, a, b);
+				checkWin(table, a, b, n); // ново е тук !!!
+			}
 		}
 	}
 	
@@ -117,13 +109,7 @@ public class TicTacToe {
 			// table
 			System.out.print("\t");
 			for (int i = 1; i <= a; i++) {
-				if (table[i][j] == "O") {
-					System.out.print("\u001B[32m" + table[i][j] + "\u001B[0m"); // green
-				} else if (table[i][j] == "X") {
-					System.out.print("\u001B[31m" + table[i][j] + "\u001B[0m"); //red
-				} else {
-					System.out.print(table[i][j]); //default
-				}
+				System.out.print(table[i][j]); //default
 				if (i!=a) System.out.print(" | ");
 			}
 			System.out.println();
@@ -141,9 +127,8 @@ public class TicTacToe {
 		System.out.println();
 	}
 	
-	public static void checkWin(String[][] table, int a, int b) {
+	public static void checkWin(String[][] table, int a, int b, int n) {
 		// вертикална проверка
-		
 		for (int i = 1; i <= a; i++) {
 			int counter = 1;
 			for (int j = 1; j <= b-1; j++) {
@@ -153,7 +138,7 @@ public class TicTacToe {
 					counter = 1;
 					break;
 				}
-				if (counter == 3) {
+				if (counter == n) {
 					System.out.println("\"" + table[i][j] + "\"" + " е победителят!" + "\n" + "Пуснете играта отново, ако искате да играете още! :)");
 					System.exit(0);
 				}
@@ -170,7 +155,7 @@ public class TicTacToe {
 					counter = 1;
 					break;
 				}
-				if (counter == 3) {
+				if (counter == n) {
 					System.out.println("\"" + table[i][j] + "\"" + " е победителят!" + "\n" + "Пуснете играта отново, ако искате да играете още! :)");
 					System.exit(0);
 				}
@@ -178,10 +163,10 @@ public class TicTacToe {
 		}
 
 		// диагонална проверка ляво-дясно
-		for (int i = 1; i <= a-2; i++) {
+		for (int i = 1; i <= a-n; i++) {
 			int counter = 1;
-		    for (int j = 1; j <= b-2; j++) {
-		        for (int k = 1; k < 3; k++) {
+		    for (int j = 1; j <= b-n; j++) {
+		        for (int k = 1; k < n; k++) {
 		            if ( (table[i][j] == table[i + k][j + k]) && (table[i][j] != " ") ) {
 		                counter++;
 		            } else {
@@ -189,7 +174,7 @@ public class TicTacToe {
 		                break;
 		            }
 		        }
-		        if (counter == 3) {
+		        if (counter == n) {
 		            System.out.println("\"" + table[i][j] + "\"" + " е победителят!" + "\n" + "Пуснете играта отново, ако искате да играете още! :)");
 		            System.exit(0);
 		        }
@@ -199,8 +184,8 @@ public class TicTacToe {
 		// диагонална проверка дясно-ляво
 		for (int i = 3; i <= a; i++) {
 			int counter = 1;
-			for (int j = 1; j <= b-2; j++) {
-				for (int k = 1; k < 3; k++) {
+			for (int j = 1; j <= b-n; j++) {
+				for (int k = 1; k < n; k++) {
 		            if ( (table[i][j] == table[i - k][j + k]) && (table[i][j] != " ") ) {
 		                counter++;
 		            } else {
@@ -208,15 +193,24 @@ public class TicTacToe {
 		                break;
 		            }
 				}
-		        if (counter == 3) {
+		        if (counter == n) {
 		            System.out.println("\"" + table[i][j] + "\"" + " е победителят!" + "\n" + "Пуснете играта отново, ако искате да играете още! :)");
 		            System.exit(0);
 		        }
 			}
 		}
 		
-		
-		
+		// проверка за равенство
+		int count = 0;
+		for (int i = 1; i <= a; i++) {
+			for (int j = 1; j <= b; j++) {
+				if (table[i][j] != " ") count++;
+			}
+		}
+		if (count == a*b) {
+			System.out.println("Никой не печели! Равенство!");
+			System.exit(0);
+		}
 	}
 	
 	
